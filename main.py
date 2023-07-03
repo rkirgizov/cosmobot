@@ -1,25 +1,30 @@
-from aiogram import Bot, types
-from aiogram.dispatcher import Dispatcher
-from aiogram.utils import executor
+import asyncio
+import logging
+from aiogram import Bot, Dispatcher, types
+from aiogram.filters.command import Command
+
+# Включаем логирование, чтобы не пропустить важные сообщения
+logging.basicConfig(level=logging.INFO)
 
 from config import TOKEN
-
-
 bot = Bot(token=TOKEN)
-dp = Dispatcher(bot)
+dp = Dispatcher()
 
-@dp.message_handler(commands=['start'])
+@dp.message(Command("start"))
 async def process_start_command(message: types.Message):
-    await message.reply("Привет!\nНапиши мне что-нибудь!")
+        await message.reply("Привет!\nНапиши мне что-нибудь!")
     
-@dp.message_handler(commands=['help'])
+@dp.message(Command("help"))
 async def process_help_command(message: types.Message):
     await message.reply("Напиши мне что-нибудь, и я отправлю этот текст тебе в ответ!")
     
-@dp.message_handler()
+@dp.message()
 async def echo_message(msg: types.Message):
     await bot.send_message(msg.from_user.id, msg.text)
     
-if __name__ == '__main__':
-    executor.start_polling(dp)
+# Запуск процесса поллинга новых апдейтов
+async def main():
+    await dp.start_polling(bot)
 
+if __name__ == "__main__":
+    asyncio.run(main())
